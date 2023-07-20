@@ -1,8 +1,24 @@
 <script setup lang="ts">
 import { Ref, onMounted, ref } from "vue";
 
+const emit = defineEmits();
+
+
+type QData = {
+    playerAId: string,
+    playerAName: string,
+    playerAStat: number,
+    playerBId: string,
+    playerBName: string,
+    playerBStat: number,
+    season: string,
+    answer: string,
+    statCategory: string
+}
+
 type PropType = {
-    time: number
+    time: number,
+    question: QData
 }
 
 const clicked: Ref<boolean> = ref(false);
@@ -11,24 +27,28 @@ const props = defineProps<PropType>();
 const seconds: Ref<number> = ref(props.time);
 var timerId = 0;
 
-
-const gameData = {
-    playerAId: "1628418",
-    playerAName: "Thomas Bryant",
-    playerAPts: 9.8,
-    playerBId: "201565",
-    playerBName: "Derrick Rose",
-    playerBPts: 5.6,
-    season: "22-23",
-    answer: "Thomas Bryant",
-    statCategory: "PTS"
+const emitQuestionCompleted = () => {
+    emit('question-completed', "Payload")
 }
+
+// const gameData = {
+//     playerAId: "1628418",
+//     playerAName: "Thomas Bryant",
+//     playerAPts: 9.8,
+//     playerBId: "201565",
+//     playerBName: "Derrick Rose",
+//     playerBPts: 5.6,
+//     season: "22-23",
+//     answer: "Thomas Bryant",
+//     statCategory: "PTS"
+// }
 
 const updateTime = () => {
     seconds.value--;
     if (seconds.value === 0) {
         seconds.value = 0;
         clearInterval(timerId);
+        emitQuestionCompleted();
     }
 }
 
@@ -47,23 +67,27 @@ const onCardClick = (name: string) => {
         clearInterval(timerId);
         clicked.value = !clicked.value;
     }
-    // Add next question
+    emitQuestionCompleted();
 }
 
 const getCardStyle = (name: string, answer: string) => {
     if (seconds.value === 0)
-        return "playerCard clicked"
+        return "playerCard clicked expired"
     if (!clicked.value) {
         return "playerCard";
     } else {
         if (guess.value === answer) {
-            return name == guess.value ? "playerCard clickedCorrect" : "playerCard";
+            return name == guess.value ? "playerCard clickedCorrect" : "playerCard clicked";
         }
         else {
-            return name == guess.value ? "playerCard clickedIncorrect" : "playerCard";
+            return name == guess.value ? "playerCard clickedIncorrect" : "playerCard clicked";
         }
 
     }
+}
+
+const getTimerStyle = (time: number) => {
+    return time > 2 || time == 1 ? "rowText timer" : time == 2 ? "rowText timer timerClose" : "rowText timer timerExpired"
 }
 
 onMounted(() => {
@@ -74,26 +98,29 @@ onMounted(() => {
 <template>
     <div class="row qRow">
         <div class="qCol">
-            <h3 class="rowText">{{ gameData.statCategory }}</h3>
-            <p class="yearText">{{ gameData.season }}</p>
+            <h3 class="rowText">{{ props.question.statCategory }}</h3>
+            <p class="yearText">{{ props.question.season }}</p>
         </div>
-        <div :class="getCardStyle(gameData.playerAName, gameData.answer)" @click="onCardClick(gameData.playerAName)">
-            <div class="row">
-                <p v-show="clicked || seconds === 0">{{ gameData.playerAPts }}</p>
+        <div :class="getCardStyle(props.question.playerAName, props.question.answer)"
+            @click="onCardClick(props.question.playerAName)">
+            <img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
+            <h5>{{ props.question.playerAName }}</h5>
+            <div class="row stat">
+                <p v-show="clicked || seconds === 0">{{ props.question.playerAStat }}</p>
             </div>
-            <img class="playerHeadshot" :src="getPlayerPath(gameData.playerAId)" />
-            <h5>{{ gameData.playerAName }}</h5>
 
         </div>
         <p class="rowText">or</p>
-        <div :class="getCardStyle(gameData.playerBName, gameData.answer)" @click="onCardClick(gameData.playerBName)">
-            <div class="row">
-                <p v-show="clicked || seconds == 0">{{ gameData.playerBPts }}</p>
+        <div :class="getCardStyle(props.question.playerBName, props.question.answer)"
+            @click="onCardClick(props.question.playerBName)">
+            <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
+            <h5>{{ props.question.playerBName }}</h5>
+            <div class="row stat">
+                <p v-show="clicked || seconds == 0">{{ props.question.playerBStat }}</p>
             </div>
-            <img class="playerHeadshot" :src="getPlayerPath(gameData.playerBId)" />
-            <h5>{{ gameData.playerBName }}</h5>
         </div>
-        <p @click="runTimer" class="rowText timer">{{ seconds }}</p>
+        <h4 @click="runTimer" :class="getTimerStyle(seconds)">{{ seconds }}</h4>
+        <Timer :seconds="seconds" />
     </div>
 </template>
 
@@ -101,11 +128,16 @@ onMounted(() => {
 .row {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+}
+
+.stat {
+    justify-content: right;
 }
 
 .qRow {
-    margin-top: 1.6em;
-    margin-bottom: 1.6em;
+    margin-top: 3em;
+    margin-bottom: 3em;
 }
 
 h5 {
@@ -126,18 +158,24 @@ h5 {
 }
 
 .playerCard {
-    outline: solid 2px black;
-    border-radius: 2px;
+    outline: solid 6px black;
     padding-top: 1em;
     padding-right: 1em;
     padding-left: 1em;
     padding-bottom: .5em;
     margin-left: 1em;
     margin-right: 1em;
+    background-color: white;
+
 }
 
 .clicked {
     background-color: rgba(54, 69, 79, 0.2)
+}
+
+.expired {
+    /* outline: solid 6px red; */
+    background-color: rgba(128, 0, 0, 0.3);
 }
 
 .clickedCorrect {
@@ -175,10 +213,23 @@ p {
 
 .timer {
     outline: solid 1px black;
-    border-radius: 2px;
     padding: .2em;
-    margin-left: 1.5em;
-    padding-right: .6em;
-    padding-left: .6em;
+    min-width: 3vw;
+    min-height: 3vw;
+    background-color: black;
+    color: white;
+    margin-left: 1em;
+}
+
+.timerExpired {
+    outline: solid 3px rgba(128, 0, 0, 0.5);
+    ;
+    background-color: black;
+    color: white;
+}
+
+.timerClose {
+    color: white;
+    outline: solid 3px rgba(255, 150, 0, .7);
 }
 </style>
