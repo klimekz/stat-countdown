@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@picocss/pico": "^1.5.10",
-    "three": "^0.154.0",
     "vue": "^3.3.4"
   },
   "devDependencies": {
