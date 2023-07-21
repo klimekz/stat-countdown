@@ -1,9 +1,5 @@
 <script setup lang="ts">
 import { Ref, onMounted, ref } from "vue";
-
-const emit = defineEmits();
-
-
 type QData = {
     playerAId: string,
     playerAName: string,
@@ -15,12 +11,11 @@ type QData = {
     answer: string,
     statCategory: string
 }
-
 type PropType = {
     time: number,
     question: QData
 }
-
+const emit = defineEmits();
 const clicked: Ref<boolean> = ref(false);
 const guess: Ref<string> = ref("");
 const props = defineProps<PropType>();
@@ -31,29 +26,8 @@ const emitQuestionCompleted = () => {
     emit('question-completed', "Payload")
 }
 
-// const gameData = {
-//     playerAId: "1628418",
-//     playerAName: "Thomas Bryant",
-//     playerAPts: 9.8,
-//     playerBId: "201565",
-//     playerBName: "Derrick Rose",
-//     playerBPts: 5.6,
-//     season: "22-23",
-//     answer: "Thomas Bryant",
-//     statCategory: "PTS"
-// }
-
-const updateTime = () => {
-    seconds.value--;
-    if (seconds.value === 0) {
-        seconds.value = 0;
-        clearInterval(timerId);
-        emitQuestionCompleted();
-    }
-}
-
-const runTimer = () => {
-    timerId = setInterval(updateTime, 1000);
+const emitQuestionCorrect = () => {
+    emit('question-correct', "Payload");
 }
 
 const getPlayerPath = (playerId: string): string => {
@@ -62,12 +36,14 @@ const getPlayerPath = (playerId: string): string => {
 }
 
 const onCardClick = (name: string) => {
-    if (!clicked.value) {
+    if (!clicked.value && seconds.value > 0) {
         guess.value = name;
         clearInterval(timerId);
         clicked.value = !clicked.value;
+        if (guess.value === props.question.answer)
+            emitQuestionCorrect();
+        emitQuestionCompleted();
     }
-    emitQuestionCompleted();
 }
 
 const getCardStyle = (name: string, answer: string) => {
@@ -84,6 +60,19 @@ const getCardStyle = (name: string, answer: string) => {
         }
 
     }
+}
+
+const updateTime = () => {
+    seconds.value--;
+    if (seconds.value === 0) {
+        seconds.value = 0;
+        clearInterval(timerId);
+        emitQuestionCompleted();
+    }
+}
+
+const runTimer = () => {
+    timerId = setInterval(updateTime, 1000);
 }
 
 const getTimerStyle = (time: number) => {
@@ -104,23 +93,23 @@ onMounted(() => {
         <div :class="getCardStyle(props.question.playerAName, props.question.answer)"
             @click="onCardClick(props.question.playerAName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
-            <h5>{{ props.question.playerAName }}</h5>
             <div class="row stat">
-                <p v-show="clicked || seconds === 0">{{ props.question.playerAStat }}</p>
+                <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat }}</p>
             </div>
-
+            <h4 class="disableSelect nameText">{{ props.question.playerAName }}</h4>
         </div>
         <p class="rowText">or</p>
         <div :class="getCardStyle(props.question.playerBName, props.question.answer)"
             @click="onCardClick(props.question.playerBName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
-            <h5>{{ props.question.playerBName }}</h5>
             <div class="row stat">
-                <p v-show="clicked || seconds == 0">{{ props.question.playerBStat }}</p>
+                <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat }}</p>
             </div>
+            <h4 class="disableSelect nameText">{{ props.question.playerBName }}</h4>
         </div>
-        <h4 @click="runTimer" :class="getTimerStyle(seconds)">{{ seconds }}</h4>
-        <Timer :seconds="seconds" />
+        <div :class="getTimerStyle(seconds)">
+            <h4 class="timerText disableSelect" @click="runTimer">{{ seconds }}</h4>
+        </div>
     </div>
 </template>
 
@@ -140,9 +129,8 @@ onMounted(() => {
     margin-bottom: 3em;
 }
 
-h5 {
+.nameText {
     margin: 0;
-
 }
 
 .qCol {
@@ -199,6 +187,14 @@ h5 {
 p {
     margin: 0;
     padding: 0;
+
+}
+
+.disableSelect {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .playerHeadshot {
@@ -214,16 +210,21 @@ p {
 .timer {
     outline: solid 1px black;
     padding: .2em;
-    min-width: 3vw;
-    min-height: 3vw;
+    min-width: 2.5em;
+    min-height: 2.5em;
+    max-width: 2.5em;
+    max-height: 2.5em;
     background-color: black;
     color: white;
     margin-left: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
 }
 
 .timerExpired {
     outline: solid 3px rgba(128, 0, 0, 0.5);
-    ;
     background-color: black;
     color: white;
 }
