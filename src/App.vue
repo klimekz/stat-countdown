@@ -25,12 +25,16 @@ function startRandomGame() {
       player pairs.</h3>
     <button v-if="!playing" @click="startDailyChallenge">Daily Challenge</button>
     <button v-if="!playing" @click="startRandomGame">Free Play</button>
-    <GameInstance v-if="playing"></GameInstance>
+    <GameInstance class="gameBorder" v-if="playing"></GameInstance>
   </div>
 </template>
 
 <style scoped>
 button {
   margin: 2em;
+}
+
+.gameBorder {
+  margin-bottom: 6em;
 }
 </style>

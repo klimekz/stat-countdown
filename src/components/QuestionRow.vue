@@ -33,6 +33,10 @@ const emitQuestionCorrect = () => {
     emit('question-correct', "Payload");
 }
 
+const emitQuestionIncorrect = () => {
+    emit('question-incorrect', "Payload");
+}
+
 const getPlayerPath = (playerId: string): string => {
     return "https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/" +
         playerId + ".png";
@@ -45,6 +49,8 @@ const onCardClick = (name: string) => {
         clicked.value = !clicked.value;
         if (guess.value === props.question.answer)
             emitQuestionCorrect();
+        else
+            emitQuestionIncorrect();
         emitQuestionCompleted();
     }
 }
