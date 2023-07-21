@@ -10,7 +10,8 @@ function startDailyChallenge() {
 }
 
 function startRandomGame() {
-  playing.value = true;
+  // playing.value = true;
+  alert("'Free Play' coming soon! 'Free Play' will allow additional options to filter time ranges against the data. Please create an account to have access to 'Free Play' on drop!")
 }
 </script>
 

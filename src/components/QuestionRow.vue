@@ -4,12 +4,15 @@ type QData = {
     playerAId: string,
     playerAName: string,
     playerAStat: number,
+    playerATeam: string,
     playerBId: string,
     playerBName: string,
     playerBStat: number,
+    playerBTeam: string,
     season: string,
     answer: string,
-    statCategory: string
+    statCategory: string,
+    interval: number
 }
 type PropType = {
     time: number,
@@ -87,25 +90,25 @@ onMounted(() => {
 <template>
     <div class="row qRow">
         <div class="qCol">
-            <h3 class="rowText">{{ props.question.statCategory }}</h3>
-            <p class="yearText">{{ props.question.season }}</p>
+            <h2 class="rowText">{{ props.question.statCategory }}</h2>
+            <h3 class="yearText">{{ props.question.season }}</h3>
         </div>
         <div :class="getCardStyle(props.question.playerAName, props.question.answer)"
             @click="onCardClick(props.question.playerAName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
             <div class="row stat">
-                <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat }}</p>
+                <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat.toFixed(2) }}</p>
             </div>
-            <h4 class="disableSelect nameText">{{ props.question.playerAName }}</h4>
+            <h4 class="disableSelect nameText">{{ props.question.playerAName }} | {{ props.question.playerATeam }}</h4>
         </div>
         <p class="rowText">or</p>
         <div :class="getCardStyle(props.question.playerBName, props.question.answer)"
             @click="onCardClick(props.question.playerBName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
             <div class="row stat">
-                <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat }}</p>
+                <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat.toFixed(2) }}</p>
             </div>
-            <h4 class="disableSelect nameText">{{ props.question.playerBName }}</h4>
+            <h4 class="disableSelect nameText">{{ props.question.playerBName }} | {{ props.question.playerBTeam }}</h4>
         </div>
         <div :class="getTimerStyle(seconds)">
             <h4 class="timerText disableSelect" @click="runTimer">{{ seconds }}</h4>
@@ -203,7 +206,6 @@ p {
 }
 
 .yearText {
-    font-size: .8em;
     margin-bottom: auto;
 }
 
@@ -225,7 +227,6 @@ p {
 
 .timerExpired {
     outline: solid 3px rgba(128, 0, 0, 0.5);
-    background-color: black;
     color: white;
 }
 
