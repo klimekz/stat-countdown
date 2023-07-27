@@ -86,7 +86,7 @@ const runTimer = () => {
 }
 
 const getTimerStyle = (time: number) => {
-    return time > 2 ? "rowText timer" : time == 2 ? "rowText timer timerClose" : time == 1 ? "rowText timer timerCloser" : "rowText timer timerExpired"
+    return time > 2 ? " timer" : time == 2 ? " timer timerClose" : time == 1 ? " timer timerCloser" : " timer timerExpired"
 }
 
 onMounted(() => {
@@ -143,6 +143,12 @@ onMounted(() => {
 
 }
 
+.timerText {
+    /* outline: solid 1px red; */
+    align-self: center;
+
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -151,6 +157,7 @@ onMounted(() => {
 
 .stat {
     justify-content: right;
+    padding-right: .5em;
 }
 
 
@@ -173,8 +180,8 @@ onMounted(() => {
 }
 
 .rowText {
-    margin-top: auto;
-    margin-bottom: auto;
+    padding: 0;
+    margin-right: .66em;
 }
 
 .playerCard {
@@ -223,8 +230,6 @@ p {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    padding: 0;
-    padding-right: .5em;
 }
 
 .playerHeadshot {
@@ -249,7 +254,6 @@ p {
     display: flex;
     flex-direction: column;
     justify-content: center;
-
 }
 
 .timerExpired {
@@ -271,9 +275,9 @@ p {
 }
 
 p {
-    padding-right: .4em;
-    padding-top: .4em;
-    padding-bottom: 0;
+    /* padding-right: .4em; */
+    /* padding-top: .4em; */
+    /* padding-bottom: 0; */
 }
 
 img {
