@@ -57,15 +57,15 @@ const onCardClick = (name: string) => {
 
 const getCardStyle = (name: string, answer: string) => {
     if (seconds.value === 0)
-        return "playerCard clicked expired"
+        return "info clicked expired"
     if (!clicked.value) {
-        return "playerCard";
+        return "info";
     } else {
         if (guess.value === answer) {
-            return name == guess.value ? "playerCard clickedCorrect" : "playerCard clicked";
+            return name == guess.value ? "info clickedCorrect" : "info clicked";
         }
         else {
-            return name == guess.value ? "playerCard clickedIncorrect" : "playerCard clicked";
+            return name == guess.value ? "info clickedIncorrect" : "info clicked";
         }
 
     }
@@ -80,12 +80,13 @@ const updateTime = () => {
     }
 }
 
+
 const runTimer = () => {
     timerId = setInterval(updateTime, 1000);
 }
 
 const getTimerStyle = (time: number) => {
-    return time > 2 || time == 1 ? "rowText timer" : time == 2 ? "rowText timer timerClose" : "rowText timer timerExpired"
+    return time > 2 ? "rowText timer" : time == 2 ? "rowText timer timerClose" : time == 1 ? "rowText timer timerCloser" : "rowText timer timerExpired"
 }
 
 onMounted(() => {
@@ -99,30 +100,49 @@ onMounted(() => {
             <h2 class="rowText">{{ props.question.statCategory }}</h2>
             <h3 class="yearText">{{ props.question.season }}</h3>
         </div>
-        <div :class="getCardStyle(props.question.playerAName, props.question.answer)"
-            @click="onCardClick(props.question.playerAName)">
+        <div class="playerCard" @click="onCardClick(props.question.playerAName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
-            <div class="row stat">
-                <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat.toFixed(2) }}</p>
+            <div :class="getCardStyle(props.question.playerAName, props.question.answer)">
+                <div class="nameDiv">
+                    <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
+                    <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
+                </div>
+                <div class="row stat">
+                    <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat.toFixed(1) }}
+                    </p>
+                </div>
             </div>
-            <h4 class="disableSelect nameText">{{ props.question.playerAName }} | {{ props.question.playerATeam }}</h4>
         </div>
         <p class="rowText">or</p>
-        <div :class="getCardStyle(props.question.playerBName, props.question.answer)"
-            @click="onCardClick(props.question.playerBName)">
+        <div class="playerCard" @click="onCardClick(props.question.playerBName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
-            <div class="row stat">
-                <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat.toFixed(2) }}</p>
+            <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
+                <div class="nameDiv">
+                    <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
+                    <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
+                </div>
+                <div class="row stat">
+                    <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat.toFixed(1) }}
+                    </p>
+                </div>
             </div>
-            <h4 class="disableSelect nameText">{{ props.question.playerBName }} | {{ props.question.playerBTeam }}</h4>
         </div>
         <div :class="getTimerStyle(seconds)">
-            <h4 class="timerText disableSelect" @click="runTimer">{{ seconds }}</h4>
+            <h4 class="timerText disableSelect" @click="runTimer">0{{ seconds }}</h4>
         </div>
     </div>
 </template>
 
 <style scoped>
+.nameDiv {}
+
+.info {
+    border-top: solid 6px black;
+    padding-top: .5em;
+    padding-bottom: .5em;
+
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -133,6 +153,7 @@ onMounted(() => {
     justify-content: right;
 }
 
+
 .qRow {
     margin-top: 3em;
     margin-bottom: 3em;
@@ -140,6 +161,8 @@ onMounted(() => {
 
 .nameText {
     margin: 0;
+    padding-right: .5em;
+    padding-left: .5em;
 }
 
 .qCol {
@@ -155,23 +178,19 @@ onMounted(() => {
 }
 
 .playerCard {
-    outline: solid 6px black;
-    padding-top: 1em;
-    padding-right: 1em;
-    padding-left: 1em;
-    padding-bottom: .5em;
-    margin-left: 1em;
-    margin-right: 1em;
+    outline: solid 9px black;
+    margin-left: 1.66em;
+    margin-right: 1.66em;
     background-color: white;
-
+    min-width: 23%;
+    border-radius: 1px;
 }
 
 .clicked {
-    background-color: rgba(54, 69, 79, 0.2)
+    background-color: rgba(54, 69, 79, 0.364);
 }
 
 .expired {
-    /* outline: solid 6px red; */
     background-color: rgba(128, 0, 0, 0.3);
 }
 
@@ -204,6 +223,8 @@ p {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    padding: 0;
+    padding-right: .5em;
 }
 
 .playerHeadshot {
@@ -232,12 +253,30 @@ p {
 }
 
 .timerExpired {
-    outline: solid 3px rgba(128, 0, 0, 0.5);
-    color: white;
+    /* outline: solid 3px rgba(128, 0, 0, 0.5); */
+    background-color: rgba(128, 0, 0, 0.3);
+    outline: solid 3px black;
+    color: black;
 }
 
 .timerClose {
     color: white;
     outline: solid 3px rgba(255, 150, 0, .7);
+}
+
+
+.timerCloser {
+    outline: solid 3px rgba(128, 0, 0, 0.5);
+    color: white;
+}
+
+p {
+    padding-right: .4em;
+    padding-top: .4em;
+    padding-bottom: 0;
+}
+
+img {
+    margin-top: .5em;
 }
 </style>

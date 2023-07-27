@@ -65,6 +65,8 @@ onMounted(() => {
 <template>
     <div class="statCol">
         <h2>Today's Stats</h2>
+        <p>{{ new Date().toLocaleDateString("en-us") }}</p>
+        <br />
         <h4>Number of Questions Guessed Correctly</h4>
         <Bar v-if="loaded" id="correct-graph" :options="{
             responsive: true,

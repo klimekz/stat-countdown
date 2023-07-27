@@ -17,6 +17,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const timerSeconds = ref(5);
 
 async function getQs() {
     const querySnapshot = await getDocs(collection(db, "daily-challenge", getDate(), "questions"));
@@ -80,6 +81,15 @@ function addNextQuestion() {
     else if (numQuestions < 10) {
         displayQuestions.value.push(questions.value[numQuestions]);
         numQuestions++;
+        if (numQuestions == 4) {
+            timerSeconds.value = 4;
+        }
+        if (numQuestions == 7) {
+            timerSeconds.value = 3;
+        }
+        if (numQuestions == 10) {
+            timerSeconds.value = 2;
+        }
     }
 
 }
@@ -113,7 +123,7 @@ onMounted(() => {
     <div>
         <h3 v-if="!loaded">Loading. . . </h3>
         <QuestionRow v-if="loaded" @question-correct="incrCorrect" @question-incorrect="incrIncorrect"
-            @question-completed="addNextQuestion" :time="5" v-for="q in displayQuestions" :question="q" />
+            @question-completed="addNextQuestion" :time="timerSeconds" v-for="q in displayQuestions" :question="q" />
         <h3 v-if="gameComplete">{{ numCorrect }} / {{ numQuestions }}</h3>
         <h3 v-if="gameComplete">You answered {{ numCorrectStreak }} questions correctly before making a mistake. (xth
             percentile)</h3>
