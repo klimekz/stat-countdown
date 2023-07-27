@@ -4,20 +4,34 @@ import QuestionRow from "./QuestionRow.vue";
 import DailyStats from "./DailyStats.vue";
 import { getFirestore, collection, getDocs, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-const loaded: Ref<boolean> = ref(false);
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBg4jyjrEXh02M3iFpbsXGx9hsta-3Mfd0",
-    authDomain: "vue-nba-guess.firebaseapp.com",
-    projectId: "vue-nba-guess",
-    storageBucket: "vue-nba-guess.appspot.com",
-    messagingSenderId: "608907352543",
-    appId: "1:608907352543:web:36f7fc4d78d70bcf7acc6a"
-};
+import { firebaseConfig } from "./FirebaseConfig.ts";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const displayQuestions: Ref<QData[]> = ref([]);
+const gameComplete = ref(false);
+const loaded: Ref<boolean> = ref(false);
+const numCorrect: Ref<number> = ref(0);
+const numCorrectStreak: Ref<number> = ref(0);
+const numIncorrect: Ref<number> = ref(0);
 const timerSeconds = ref(5);
+const questions: Ref<QData[]> = ref([]);
+let numQuestions = 1;
+
+type QData = {
+    playerAId: string,
+    playerAName: string,
+    playerAStat: number,
+    playerATeam: string,
+    playerBId: string,
+    playerBName: string,
+    playerBStat: number,
+    playerBTeam: string,
+    season: string,
+    answer: string,
+    statCategory: string,
+    interval: number
+}
 
 async function getQs() {
     const querySnapshot = await getDocs(collection(db, "daily-challenge", getDate(), "questions"));
@@ -39,36 +53,6 @@ async function getQs() {
         questions.value.push(q)
     });
 }
-
-type QData = {
-    playerAId: string,
-    playerAName: string,
-    playerAStat: number,
-    playerATeam: string,
-    playerBId: string,
-    playerBName: string,
-    playerBStat: number,
-    playerBTeam: string,
-    season: string,
-    answer: string,
-    statCategory: string,
-    interval: number
-}
-
-function getDate() {
-    const d: Date = new Date()
-    const month: string = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
-    const date: string = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
-    return d.getFullYear() + "-" + month + "-" + date;
-}
-
-let numQuestions = 1;
-const questions: Ref<QData[]> = ref([]);
-const displayQuestions: Ref<QData[]> = ref([]);
-const numCorrect: Ref<number> = ref(0);
-const numIncorrect: Ref<number> = ref(0);
-const numCorrectStreak: Ref<number> = ref(0);
-
 
 function addNextQuestion() {
     if (numQuestions == 10) {
@@ -94,6 +78,13 @@ function addNextQuestion() {
 
 }
 
+function getDate() {
+    const d: Date = new Date()
+    const month: string = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
+    const date: string = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
+    return d.getFullYear() + "-" + month + "-" + date;
+}
+
 function incrCorrect() {
     if (numIncorrect.value === 0)
         numCorrectStreak.value++;
@@ -103,9 +94,6 @@ function incrCorrect() {
 function incrIncorrect() {
     numIncorrect.value++;
 }
-
-const gameComplete = ref(false);
-
 
 onMounted(() => {
     getQs().then(() => {
@@ -125,7 +113,8 @@ onMounted(() => {
         <QuestionRow v-if="loaded" @question-correct="incrCorrect" @question-incorrect="incrIncorrect"
             @question-completed="addNextQuestion" :time="timerSeconds" v-for="q in displayQuestions" :question="q" />
         <h3 v-if="gameComplete">{{ numCorrect }} / {{ numQuestions }}</h3>
-        <h3 v-if="gameComplete">You answered {{ numCorrectStreak }} questions correctly before making a mistake. (xth
+        <h3 v-if="gameComplete">You answered {{ numCorrectStreak }} {{ numCorrectStreak === 1 ? "question" : "questions" }}
+            correctly before making a mistake. (xth
             percentile)</h3>
         <DailyStats v-if="gameComplete" />
     </div>

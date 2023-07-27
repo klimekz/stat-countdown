@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Ref, onMounted, ref } from "vue";
+
 type QData = {
     playerAId: string,
     playerAName: string,
@@ -14,48 +15,32 @@ type QData = {
     statCategory: string,
     interval: number
 }
+
 type PropType = {
     time: number,
     question: QData
 }
-const emit = defineEmits();
+
 const clicked: Ref<boolean> = ref(false);
+const emit = defineEmits();
 const guess: Ref<string> = ref("");
 const props = defineProps<PropType>();
 const seconds: Ref<number> = ref(props.time);
-var timerId = 0;
+let timerId: number = 0;
 
-const emitQuestionCompleted = () => {
-    emit('question-completed', "Payload")
+function emitQuestionCompleted() {
+    emit('question-completed', "Payload");
 }
 
-const emitQuestionCorrect = () => {
+function emitQuestionCorrect() {
     emit('question-correct', "Payload");
 }
 
-const emitQuestionIncorrect = () => {
+function emitQuestionIncorrect() {
     emit('question-incorrect', "Payload");
 }
 
-const getPlayerPath = (playerId: string): string => {
-    return "https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/" +
-        playerId + ".png";
-}
-
-const onCardClick = (name: string) => {
-    if (!clicked.value && seconds.value > 0) {
-        guess.value = name;
-        clearInterval(timerId);
-        clicked.value = !clicked.value;
-        if (guess.value === props.question.answer)
-            emitQuestionCorrect();
-        else
-            emitQuestionIncorrect();
-        emitQuestionCompleted();
-    }
-}
-
-const getCardStyle = (name: string, answer: string) => {
+function getCardStyle(name: string, answer: string): string {
     if (seconds.value === 0)
         return "info clicked expired"
     if (!clicked.value) {
@@ -71,7 +56,33 @@ const getCardStyle = (name: string, answer: string) => {
     }
 }
 
-const updateTime = () => {
+function getPlayerPath(playerId: string): string {
+    return "https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/" +
+        playerId + ".png";
+}
+
+function getTimerStyle(time: number): string {
+    return time > 2 ? " timer" : time == 2 ? " timer timerClose" : time == 1 ? " timer timerCloser" : " timer timerExpired"
+}
+
+function onCardClick(name: string) {
+    if (!clicked.value && seconds.value > 0) {
+        guess.value = name;
+        clearInterval(timerId);
+        clicked.value = !clicked.value;
+        if (guess.value === props.question.answer)
+            emitQuestionCorrect();
+        else
+            emitQuestionIncorrect();
+        emitQuestionCompleted();
+    }
+}
+
+function runTimer() {
+    timerId = setInterval(updateTime, 1000);
+}
+
+function updateTime() {
     seconds.value--;
     if (seconds.value === 0) {
         seconds.value = 0;
@@ -80,18 +91,10 @@ const updateTime = () => {
     }
 }
 
-
-const runTimer = () => {
-    timerId = setInterval(updateTime, 1000);
-}
-
-const getTimerStyle = (time: number) => {
-    return time > 2 ? " timer" : time == 2 ? " timer timerClose" : time == 1 ? " timer timerCloser" : " timer timerExpired"
-}
-
 onMounted(() => {
     runTimer();
 })
+
 </script>
 
 <template>
@@ -113,7 +116,7 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <p class="rowText">or</p>
+        <p class="orText">or</p>
         <div class="playerCard" @click="onCardClick(props.question.playerBName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
             <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
@@ -134,54 +137,45 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.nameDiv {}
+.clicked {
+    background-color: rgba(54, 69, 79, 0.364);
+}
+
+.clickedCorrect {
+    background-color: rgba(0, 128, 0, 0.3);
+}
+
+.clickedIncorrect {
+    background-color: rgba(128, 0, 0, 0.3);
+}
+
+.clicked:hover,
+.clickedIncorrect:hover,
+.clickedCorrect:hover {
+    transform: scale(1.0);
+}
+
+.disableSelect {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.expired {
+    background-color: rgba(128, 0, 0, 0.3);
+}
 
 .info {
     border-top: solid 6px black;
     padding-top: .5em;
     padding-bottom: .5em;
-
-}
-
-.timerText {
-    /* outline: solid 1px red; */
-    align-self: center;
-
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}
-
-.stat {
-    justify-content: right;
-    padding-right: .5em;
-}
-
-
-.qRow {
-    margin-top: 3em;
-    margin-bottom: 3em;
 }
 
 .nameText {
     margin: 0;
     padding-right: .5em;
     padding-left: .5em;
-}
-
-.qCol {
-    display: flex;
-    flex-direction: column;
-    margin-right: 2em;
-    padding-right: 1em;
-}
-
-.rowText {
-    padding: 0;
-    margin-right: .66em;
 }
 
 .playerCard {
@@ -193,43 +187,8 @@ onMounted(() => {
     border-radius: 1px;
 }
 
-.clicked {
-    background-color: rgba(54, 69, 79, 0.364);
-}
-
-.expired {
-    background-color: rgba(128, 0, 0, 0.3);
-}
-
-.clickedCorrect {
-    background-color: rgba(0, 128, 0, 0.3);
-}
-
-.clickedIncorrect {
-    background-color: rgba(128, 0, 0, 0.3);
-}
-
 .playerCard:hover {
     transform: scale(1.02);
-}
-
-.clicked:hover,
-.clickedIncorrect:hover,
-.clickedCorrect:hover {
-    transform: scale(1.0);
-}
-
-p {
-    margin: 0;
-    padding: 0;
-
-}
-
-.disableSelect {
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 .playerHeadshot {
@@ -237,8 +196,32 @@ p {
     max-height: 100%;
 }
 
-.yearText {
-    margin-bottom: auto;
+.qCol {
+    display: flex;
+    flex-direction: column;
+    margin-right: 2em;
+    padding-right: 1em;
+}
+
+.qRow {
+    margin-top: 3em;
+    margin-bottom: 3em;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.rowText {
+    padding: 0;
+    margin-right: .66em;
+}
+
+.stat {
+    justify-content: right;
+    padding-right: .5em;
 }
 
 .timer {
@@ -256,31 +239,36 @@ p {
     justify-content: center;
 }
 
-.timerExpired {
-    /* outline: solid 3px rgba(128, 0, 0, 0.5); */
-    background-color: rgba(128, 0, 0, 0.3);
-    outline: solid 3px black;
-    color: black;
-}
-
 .timerClose {
     color: white;
     outline: solid 3px rgba(255, 150, 0, .7);
 }
-
 
 .timerCloser {
     outline: solid 3px rgba(128, 0, 0, 0.5);
     color: white;
 }
 
-p {
-    /* padding-right: .4em; */
-    /* padding-top: .4em; */
-    /* padding-bottom: 0; */
+.timerExpired {
+    background-color: rgba(128, 0, 0, 0.3);
+    outline: solid 3px black;
+    color: black;
+}
+
+.timerText {
+    align-self: center;
+}
+
+.yearText {
+    margin-bottom: auto;
 }
 
 img {
     margin-top: .5em;
+}
+
+p {
+    margin: 0;
+    padding: 0;
 }
 </style>

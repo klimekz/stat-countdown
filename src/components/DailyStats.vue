@@ -1,35 +1,19 @@
 <script setup lang="ts">
-import { Ref, onMounted, ref } from "vue";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
 import { Bar } from "vue-chartjs"
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+import { firebaseConfig } from "./FirebaseConfig.ts";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { Ref, onMounted, ref } from "vue";
 
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBg4jyjrEXh02M3iFpbsXGx9hsta-3Mfd0",
-    authDomain: "vue-nba-guess.firebaseapp.com",
-    projectId: "vue-nba-guess",
-    storageBucket: "vue-nba-guess.appspot.com",
-    messagingSenderId: "608907352543",
-    appId: "1:608907352543:web:36f7fc4d78d70bcf7acc6a"
-};
-const results: Ref<any> = ref([]);
-const loaded: Ref<boolean> = ref(false);
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-function getDate() {
-    const d: Date = new Date()
-    const month: string = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
-    const date: string = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
-    return d.getFullYear() + "-" + month + "-" + date;
-}
-
+const loaded: Ref<boolean> = ref(false);
+const results: Ref<any> = ref([]);
 let numCorrectValues: any = {};
 let numStraightValue: any = {};
 
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 async function getResults() {
     const querySnapshot = await getDocs(collection(db, "daily-challenge", getDate(), "results"));
@@ -53,6 +37,13 @@ async function getResults() {
 
         results.value.push(result)
     });
+}
+
+function getDate() {
+    const d: Date = new Date()
+    const month: string = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
+    const date: string = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
+    return d.getFullYear() + "-" + month + "-" + date;
 }
 
 onMounted(() => {
@@ -104,16 +95,16 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.graph {
+    max-width: 55%;
+    max-height: 55%;
+}
+
 .statCol {
     margin-top: 3em;
     display: flex;
     flex-direction: column;
     align-items: center;
     /* max-width: 66%; */
-}
-
-.graph {
-    max-width: 60%;
-    max-height: 60%;
 }
 </style>
