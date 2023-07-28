@@ -26,7 +26,7 @@ const emit = defineEmits();
 const guess: Ref<string> = ref("");
 const props = defineProps<PropType>();
 const seconds: Ref<number> = ref(props.time);
-let timerId: number = 0;
+let timerId: any = 0;
 
 function emitQuestionCompleted() {
     emit('question-completed', "Payload");
@@ -40,9 +40,13 @@ function emitQuestionIncorrect() {
     emit('question-incorrect', "Payload");
 }
 
+function emitQuestionMissed() {
+    emit('question-missed', "Payload")
+}
+
 function getCardStyle(name: string, answer: string): string {
     if (seconds.value === 0)
-        return "info clicked expired"
+        return "info clicked noClick"
     if (!clicked.value) {
         return "info";
     } else {
@@ -70,8 +74,10 @@ function onCardClick(name: string) {
         guess.value = name;
         clearInterval(timerId);
         clicked.value = !clicked.value;
-        if (guess.value === props.question.answer)
+        if (guess.value === props.question.answer) {
+            console.log('correct')
             emitQuestionCorrect();
+        }
         else
             emitQuestionIncorrect();
         emitQuestionCompleted();
@@ -88,6 +94,7 @@ function updateTime() {
         seconds.value = 0;
         clearInterval(timerId);
         emitQuestionCompleted();
+        emitQuestionMissed();
     }
 }
 
@@ -100,19 +107,22 @@ onMounted(() => {
 <template>
     <div class="row qRow">
         <div class="qCol">
-            <h2 class="rowText">{{ props.question.statCategory }}</h2>
+            <h2>{{ props.question.statCategory }}</h2>
             <h3 class="yearText">{{ props.question.season }}</h3>
         </div>
         <div class="playerCard" @click="onCardClick(props.question.playerAName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
             <div :class="getCardStyle(props.question.playerAName, props.question.answer)">
-                <div class="nameDiv">
-                    <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
-                    <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
-                </div>
-                <div class="row stat">
-                    <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat.toFixed(1) }}
-                    </p>
+                <div class="infoRow">
+                    <div class="nameDiv">
+                        <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
+                        <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
+                    </div>
+                    <div class="row stat">
+                        <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat.toFixed(1)
+                        }} {{ props.question.statCategory.substring(0, 1) }}PG
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,13 +130,16 @@ onMounted(() => {
         <div class="playerCard" @click="onCardClick(props.question.playerBName)">
             <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
             <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
-                <div class="nameDiv">
-                    <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
-                    <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
-                </div>
-                <div class="row stat">
-                    <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat.toFixed(1) }}
-                    </p>
+                <div class="infoRow">
+                    <div class="nameDiv">
+                        <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
+                        <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
+                    </div>
+                    <div class="row stat">
+                        <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat.toFixed(1)
+                        }} {{ props.question.statCategory.substring(0, 1) }}PG
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -147,6 +160,10 @@ onMounted(() => {
 
 .clickedIncorrect {
     background-color: rgba(128, 0, 0, 0.3);
+}
+
+.noClick {
+    background-color: rgba(186, 105, 11, 0.3);
 }
 
 .clicked:hover,
@@ -178,8 +195,13 @@ onMounted(() => {
     padding-left: .5em;
 }
 
+.orText {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
 .playerCard {
-    outline: solid 9px black;
+    outline: solid 7px black;
     margin-left: 1.66em;
     margin-right: 1.66em;
     background-color: white;
@@ -188,7 +210,7 @@ onMounted(() => {
 }
 
 .playerCard:hover {
-    transform: scale(1.02);
+    transform: scale(1.03);
 }
 
 .playerHeadshot {
@@ -199,8 +221,7 @@ onMounted(() => {
 .qCol {
     display: flex;
     flex-direction: column;
-    margin-right: 2em;
-    padding-right: 1em;
+    margin-right: 1em;
 }
 
 .qRow {
@@ -214,10 +235,14 @@ onMounted(() => {
     justify-content: center;
 }
 
-.rowText {
-    padding: 0;
-    margin-right: .66em;
+.infoRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
 }
+
 
 .stat {
     justify-content: right;
@@ -237,6 +262,8 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .timerClose {
@@ -270,5 +297,4 @@ img {
 p {
     margin: 0;
     padding: 0;
-}
-</style>
+}</style>

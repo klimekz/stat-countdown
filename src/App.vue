@@ -5,6 +5,7 @@ import DailyStats from "./components/DailyStats.vue";
 
 const playing: Ref<boolean> = ref(false);
 const showStats: Ref<boolean> = ref(false);
+const completedGames: Ref<number> = ref(0);
 
 function startDailyChallenge() {
   playing.value = true;
@@ -17,29 +18,40 @@ function startRandomGame() {
 function titleClickHandler() {
   if (playing.value) {
     playing.value = !playing.value;
+    showStats.value = true;
   }
 }
+
+function handleCompletedGame() {
+  completedGames.value = completedGames.value + 1;
+}
+
+
 
 function toggleStats() {
   showStats.value = !showStats.value;
 }
+
 </script>
 
 <template>
-  <div>
+  <div class="page">
     <h1 @click="titleClickHandler">STAT COUNTDOWN</h1>
+    <div class="headerContainer" v-if="!playing">
+      <h4>Click on the player with the higher average per game for the displayed statistic (PTS/REB/AST). The range
+        between the players' average for the chosen statistic per game will be narrowed down for each question.
+      </h4>
+      <h4>Complete today's quiz to see how you rank against the field.</h4>
+    </div>
     <div class="buttons">
       <button v-if="!playing" @click="startDailyChallenge">Daily Challenge</button>
       <button v-if="!playing" @click="startRandomGame">Free Play</button>
       <button v-if="!playing && !showStats" @click="toggleStats">Show Stats</button>
       <button v-if="!playing && showStats" @click="toggleStats">Hide Stats</button>
+
     </div>
-    <h3>Click on the player with the higher per game average for the displayed stat. For each question, the range between
-      each players' average PPG is narrowed down.
-    </h3>
-    <h3>Complete today's quiz to see where you rank against the field, or test your knowledge against a random set of
-      player pairs.</h3>
-    <GameInstance class="gameBorder" v-if="playing"></GameInstance>
+    <GameInstance class="gameBorder" v-if="playing" @count-completed="handleCompletedGame"
+      @restart-game="titleClickHandler" :numCompleted="completedGames"></GameInstance>
     <DailyStats v-if="!playing && showStats" />
   </div>
 </template>
@@ -49,7 +61,23 @@ button {
   margin: 2em;
 }
 
+.headerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h4 {
+  max-width: 65%;
+
+}
+
 .gameBorder {
   margin-bottom: 2em;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
 }
 </style>

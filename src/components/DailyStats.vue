@@ -58,7 +58,7 @@ onMounted(() => {
         <h2>Today's Stats</h2>
         <p>{{ new Date().toLocaleDateString("en-us") }}</p>
         <br />
-        <h4>Number of Questions Guessed Correctly</h4>
+        <h4>Global Number of Questions Guessed Correctly</h4>
         <Bar v-if="loaded" id="correct-graph" :options="{
             responsive: true,
             backgroundColor: '#17408b',
@@ -75,7 +75,7 @@ onMounted(() => {
     }]
 }" class="media graph" />
         <br />
-        <h4>Guesses Until an Incorrect Answer</h4>
+        <h4>Global Number of Guesses Until an Incorrect Answer</h4>
         <Bar v-if="loaded" id="streak-graph" :options="{
             responsive: true,
             backgroundColor: '#c9082a',
