@@ -1,6 +1,2 @@
 .DS_STORE
 .vscode/
-
-.env
-
-FirebaseConfig.ts

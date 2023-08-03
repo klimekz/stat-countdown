@@ -72,7 +72,7 @@ function addNextQuestion() {
         instanceTime.value = (endTime.value.getTime() - startTime.value.getTime()) / 1000
         gameComplete.value = true;
         emitCompletedGame();
-        if (props.numCompleted <= 1) {
+        if (props.numCompleted < 1) {
             setDoc(doc(db, "daily-challenge", getDate(), "results", new Date().toISOString()), {
                 numCorrectScore: numCorrect.value,
                 streakCorrectScore: numCorrectStreak.value
