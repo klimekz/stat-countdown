@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, Ref, computed } from "vue";
+import { onMounted, ref, Ref } from "vue";
 import QuestionRow from "./QuestionRow.vue";
 import DailyStats from "./DailyStats.vue";
 import { getFirestore, collection, getDocs, doc, setDoc } from "firebase/firestore";
