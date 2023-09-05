@@ -1,3 +1,14 @@
-# nba-stat-guessing-game
+### [statcountdown.com](https://www.statcountdown.com)
 
-Vue 3 NBA/sports trivia game using data generated in Python. Implements emits in Vue 3 for communication between components.
+Vue.js trivia application demonstrating use of Emits to communicate between components. Utilizes a Python notebook to generate game data, and [Google Firebase](https://firebase.google.com) to store the current day's question set and statistics.
+
+Data Source: [Kaggle](https://www.kaggle.com/datasets/ricardotorresheredia/nba-stats-from-the-last-71-years)
+
+
+https://github.com/klimekz/stat-countdown/assets/47435851/46be194a-90a0-4abf-9c3d-e3344f58bf0c
+
+
+
+
+
+* Prod environment is not hosted in this repository.
