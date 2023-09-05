@@ -55,8 +55,10 @@ onMounted(() => {
 
 <template>
     <div class="statCol">
-        <h2>Today's Stats</h2>
-        <p>{{ new Date().toLocaleDateString("en-us") }}</p>
+        <div class="colRow row">
+            <h2>Today's Stats</h2>
+            <p class="dateText">{{ new Date().toLocaleDateString("en-us") }}</p>
+        </div>
         <br />
         <h4>Global Number of Questions Guessed Correctly</h4>
         <Bar v-if="loaded" id="correct-graph" :options="{
@@ -100,11 +102,18 @@ onMounted(() => {
     max-height: 55%;
 }
 
+.colRow {
+    min-width: 50%;
+}
+
 .statCol {
-    margin-top: 3em;
+    margin-top: 1.66em;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* max-width: 66%; */
+}
+
+.dateText {
+    align-self: center;
 }
 </style>

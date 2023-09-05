@@ -105,65 +105,86 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="row qRow">
-        <div class="qCol">
-            <h2>{{ props.question.statCategory }}</h2>
-            <h3 class="yearText">{{ props.question.season }}</h3>
-        </div>
-        <div class="playerCard" @click="onCardClick(props.question.playerAName)">
-            <img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
-            <div :class="getCardStyle(props.question.playerAName, props.question.answer)">
-                <div class="infoRow">
-                    <div class="nameDiv">
-                        <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
-                        <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
+    <div class="qCol">
+        <div class="row">
+            <div class="col">
+                <h2>{{ props.question.statCategory }}</h2>
+                <div class="playerCard" @click="onCardClick(props.question.playerAName)">
+                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
+                        <h5 class="teamTxt">{{ props.question.playerATeam }}</h5>
                     </div>
-                    <div class="row stat">
-                        <p v-show="clicked || seconds === 0" class="disableSelect">{{ props.question.playerAStat.toFixed(1)
-                        }} {{ props.question.statCategory.substring(0, 1) }}PG
-                        </p>
+                    <div :class="getCardStyle(props.question.playerAName, props.question.answer)">
+                        <div class="infoRow">
+                            <div class="nameDiv">
+                                <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
+                                <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
+                            </div>
+                            <div class="row stat">
+                                <p v-show="clicked || seconds === 0" class="disableSelect">{{
+                                    props.question.playerAStat.toFixed(1)
+                                }} {{ props.question.statCategory.substring(0, 1) }}PG
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div :class="getTimerStyle(seconds)">
+                <h4 class="timerText disableSelect" @click="runTimer">0{{ seconds }}</h4>
+            </div>
+            <div class="col">
+                <h2>{{ props.question.season }}</h2>
+                <div class="playerCard" @click="onCardClick(props.question.playerBName)">
+                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
+                        <h5 class="teamTxt">{{ props.question.playerBTeam }}</h5>
+                    </div>
+                    <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
+                        <div class="infoRow">
+                            <div class="nameDiv">
+                                <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
+                                <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
+                            </div>
+                            <div class="row stat">
+                                <p v-show="clicked || seconds == 0" class="disableSelect">{{
+                                    props.question.playerBStat.toFixed(1)
+                                }} {{ props.question.statCategory.substring(0, 1) }}PG
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <p class="orText">or</p>
-        <div class="playerCard" @click="onCardClick(props.question.playerBName)">
-            <img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
-            <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
-                <div class="infoRow">
-                    <div class="nameDiv">
-                        <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
-                        <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
-                    </div>
-                    <div class="row stat">
-                        <p v-show="clicked || seconds == 0" class="disableSelect">{{ props.question.playerBStat.toFixed(1)
-                        }} {{ props.question.statCategory.substring(0, 1) }}PG
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div :class="getTimerStyle(seconds)">
-            <h4 class="timerText disableSelect" @click="runTimer">0{{ seconds }}</h4>
-        </div>
+
     </div>
 </template>
 
 <style scoped>
+.teamTxt {
+    position: absolute;
+    top: .66em;
+    right: 1em;
+}
+
+.imgContainer {
+    position: relative;
+    text-align: center;
+}
+
 .clicked {
-    background-color: rgba(54, 69, 79, 0.364);
+    background-color: rgba(54, 69, 79, 0.3);
 }
 
 .clickedCorrect {
-    background-color: rgba(0, 128, 0, 0.3);
+    background-color: rgba(2, 69, 32, .3)
 }
 
 .clickedIncorrect {
-    background-color: rgba(128, 0, 0, 0.3);
+    background-color: rgba(181, 0, 22, .3);
 }
 
 .noClick {
-    background-color: rgba(186, 105, 11, 0.3);
+    background-color: rgba(200, 132, 1, .3);
 }
 
 .clicked:hover,
@@ -180,13 +201,19 @@ onMounted(() => {
 }
 
 .expired {
-    background-color: rgba(128, 0, 0, 0.3);
+    background-color: rgba(181, 0, 22, .3);
+}
+
+.headerRow {
+    justify-content: space-around;
 }
 
 .info {
     border-top: solid 6px black;
     padding-top: .5em;
     padding-bottom: .5em;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 .nameText {
@@ -201,16 +228,19 @@ onMounted(() => {
 }
 
 .playerCard {
-    outline: solid 7px black;
-    margin-left: 1.66em;
-    margin-right: 1.66em;
+    /* outline: solid 7px black; */
+    margin-right: .5em;
+    margin-left: .5em;
     background-color: white;
     min-width: 23%;
-    border-radius: 1px;
+    border-radius: 12px;
+    box-shadow: 6px 12px 12px hsl(0deg 0% 0% / 0.25);
+    margin-bottom: 4em;
 }
 
 .playerCard:hover {
-    transform: scale(1.03);
+    transform: scale(1.02);
+    box-shadow: 6px 12px 12px hsl(0deg 0% 0% / 0.21);
 }
 
 .playerHeadshot {
@@ -221,18 +251,9 @@ onMounted(() => {
 .qCol {
     display: flex;
     flex-direction: column;
-    margin-right: 1em;
-}
-
-.qRow {
-    margin-top: 3em;
-    margin-bottom: 3em;
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    margin-right: .5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 .infoRow {
@@ -250,15 +271,16 @@ onMounted(() => {
 }
 
 .timer {
-    outline: solid 1px black;
+    /* outline: solid 1px black; */
     padding: .2em;
     min-width: 2.5em;
     min-height: 2.5em;
     max-width: 2.5em;
     max-height: 2.5em;
+    margin-left: 1.33em;
+    margin-right: 1.33em;
     background-color: black;
     color: white;
-    margin-left: 1em;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -277,8 +299,8 @@ onMounted(() => {
 }
 
 .timerExpired {
-    background-color: rgba(128, 0, 0, 0.3);
-    outline: solid 3px black;
+    background-color: rgba(181, 0, 22, .3);
+    /* outline: solid 3px rgba(255, 150, 0, .7); */
     color: black;
 }
 
@@ -286,9 +308,15 @@ onMounted(() => {
     align-self: center;
 }
 
-.yearText {
-    margin-bottom: auto;
+h2 {
+    margin-top: 0;
 }
+
+h5 {
+    margin: 0;
+    padding: 0;
+}
+
 
 img {
     margin-top: .5em;
@@ -297,4 +325,5 @@ img {
 p {
     margin: 0;
     padding: 0;
-}</style>
+}
+</style>

@@ -156,7 +156,11 @@ onMounted(() => {
 <template>
     <div>
         <h3 v-if="!loaded">Loading. . . </h3>
-        <h2 v-if="loaded">Daily Challenge</h2>
+        <div class="row title">
+            <h2 v-if="loaded">Daily Challenge:
+            </h2>
+            <h3 class="date">{{ new Date().toLocaleDateString('en-us') }}</h3>
+        </div>
         <QuestionRow v-if="loaded" @question-missed="qMissed" @question-correct="incrCorrect"
             @question-incorrect="incrIncorrect" @question-completed="addNextQuestion" :time="timerSeconds"
             v-for="q in displayQuestions" :question="q" />
@@ -166,8 +170,7 @@ onMounted(() => {
             "question" :
             "questions"
         }}
-            correctly before making a mistake. (xth
-            percentile)</h3>
+            correctly before making a mistake.</h3>
 
         <br />
         <div class="resultCard" v-if="gameComplete">
@@ -180,6 +183,8 @@ onMounted(() => {
         numCompleted }}).
             </p>
             <p class="cardElement">{{ returnStr }}<br />{{ streakStr }}</p>
+            <br />
+            <a href="https://www.statcountdown.com">statcountdown.com</a>
         </div>
         <br /><br />
         <button v-if="gameComplete" @click="emitRestartGame">Restart</button>
@@ -194,11 +199,6 @@ onMounted(() => {
     flex-direction: column;
 }
 
-.resultText {
-    /* text-align: left; */
-    /* justify-content: flex-start; */
-}
-
 .results {
     display: flex;
     align-items: center;
@@ -206,19 +206,22 @@ onMounted(() => {
     justify-content: space-around;
 }
 
-
-
 .resultCard {
     padding-right: 1.5em;
     padding-left: 1.5em;
     padding-top: 1em;
     padding-bottom: 1em;
-    outline: solid 4px black;
-    border-radius: 1px;
+    border-radius: 12px;
     display: inline-block;
     background-color: white;
     text-align: left;
     max-width: 60%;
+    box-shadow: 2px 4px 4px hsl(0deg 0% 0% / 0.33);
+}
+
+.resultCard:hover {
+    box-shadow: 2.1px 4.2px 4.2px hsl(0deg 0% 0% / 0.3);
+    transform: scale(1.01);
 }
 
 .cardElement {
@@ -226,8 +229,21 @@ onMounted(() => {
     padding: .2em;
 }
 
+.date {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.title {
+    justify-content: space-evenly;
+}
+
 
 button {
     margin: 1em;
+}
+
+h2 {
+    padding-bottom: 0em;
 }
 </style>
