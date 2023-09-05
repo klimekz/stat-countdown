@@ -5,7 +5,10 @@ Vue.js trivia application demonstrating use of Emits to communicate between comp
 Data Source: [Kaggle](https://www.kaggle.com/datasets/ricardotorresheredia/nba-stats-from-the-last-71-years)
 
 
-![Image 8-7-23 at 3 15 PM](https://github.com/klimekz/stat-countdown/assets/47435851/e58dff69-49c0-4f79-9e1e-a100cd64a5d4)
+https://github.com/klimekz/stat-countdown/assets/47435851/46be194a-90a0-4abf-9c3d-e3344f58bf0c
+
+
+
 
 
 * Prod environment is not hosted in this repository.
