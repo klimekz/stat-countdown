@@ -26,22 +26,28 @@ const emit = defineEmits();
 const guess: Ref<string> = ref("");
 const props = defineProps<PropType>();
 const seconds: Ref<number> = ref(props.time);
+const showA: Ref<boolean> = ref(false);
+const showB: Ref<boolean> = ref(false);
 let timerId: any = 0;
+let startTime: Date | undefined = undefined;
+let endTime: Date | undefined = undefined;
+let diff: number = props.time + .2;
+
 
 function emitQuestionCompleted() {
-    emit('question-completed', "Payload");
+    emit('question-completed', null);
 }
 
-function emitQuestionCorrect() {
-    emit('question-correct', "Payload");
+function emitQuestionCorrect(diff: number) {
+    emit('question-correct', diff);
 }
 
-function emitQuestionIncorrect() {
-    emit('question-incorrect', "Payload");
+function emitQuestionIncorrect(diff: number) {
+    emit('question-incorrect', diff);
 }
 
-function emitQuestionMissed() {
-    emit('question-missed', "Payload")
+function emitQuestionMissed(diff: number) {
+    emit('question-missed', diff)
 }
 
 function getCardStyle(name: string, answer: string): string {
@@ -70,33 +76,49 @@ function getTimerStyle(time: number): string {
 }
 
 function onCardClick(name: string) {
+    let clickEnd = new Date()
+    if (endTime === undefined) {
+        endTime = clickEnd
+        diff = ((endTime.getTime() - startTime!.getTime()) / 1000)
+    }
+
     if (!clicked.value && seconds.value > 0) {
         guess.value = name;
         clearInterval(timerId);
         clicked.value = !clicked.value;
         if (guess.value === props.question.answer) {
-            console.log('correct')
-            emitQuestionCorrect();
+            emitQuestionCorrect(diff);
         }
-        else
-            emitQuestionIncorrect();
+        else {
+            emitQuestionIncorrect(diff);
+        }
         emitQuestionCompleted();
     }
 }
 
 function runTimer() {
+    while (!showA || !showB)
+        continue
+
+    startTime = new Date();
     timerId = setInterval(updateTime, 1000);
 }
 
 function updateTime() {
     seconds.value--;
     if (seconds.value === 0) {
+        let clickEnd = new Date()
+        if (endTime === undefined) {
+            endTime = clickEnd
+            diff = ((endTime.getTime() - startTime!.getTime()) / 1000)
+        }
         seconds.value = 0;
         clearInterval(timerId);
         emitQuestionCompleted();
-        emitQuestionMissed();
+        emitQuestionMissed(diff);
     }
 }
+
 
 onMounted(() => {
     runTimer();
@@ -106,11 +128,12 @@ onMounted(() => {
 
 <template>
     <div class="qCol">
-        <div class="row">
+        <div v-show="showA && showB" class="row">
             <div class="col">
                 <h2>{{ props.question.statCategory }}</h2>
                 <div class="playerCard" @click="onCardClick(props.question.playerAName)">
-                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)" />
+                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)"
+                            @load="showA = true" />
                         <h5 class="teamTxt">{{ props.question.playerATeam }}</h5>
                     </div>
                     <div :class="getCardStyle(props.question.playerAName, props.question.answer)">
@@ -119,10 +142,13 @@ onMounted(() => {
                                 <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
                                 <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
                             </div>
-                            <div class="row stat">
-                                <p v-show="clicked || seconds === 0" class="disableSelect">{{
+                            <div class="nameDiv stat">
+                                <p v-show="clicked || seconds == 0" class="disableSelect ">{{
                                     props.question.playerAStat.toFixed(1)
-                                }} {{ props.question.statCategory.substring(0, 1) }}PG
+                                }}
+                                </p>
+                                <p v-show="clicked || seconds == 0" class="disableSelect"> {{
+                                    props.question.statCategory.substring(0, 1) }}PG
                                 </p>
                             </div>
                         </div>
@@ -133,9 +159,10 @@ onMounted(() => {
                 <h4 class="timerText disableSelect" @click="runTimer">0{{ seconds }}</h4>
             </div>
             <div class="col">
-                <h2>{{ props.question.season }}</h2>
+                <h2>{{ props.question.season }} </h2>
                 <div class="playerCard" @click="onCardClick(props.question.playerBName)">
-                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)" />
+                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)"
+                            @load="showB = true" />
                         <h5 class="teamTxt">{{ props.question.playerBTeam }}</h5>
                     </div>
                     <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
@@ -144,10 +171,13 @@ onMounted(() => {
                                 <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
                                 <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
                             </div>
-                            <div class="row stat">
-                                <p v-show="clicked || seconds == 0" class="disableSelect">{{
+                            <div class="nameDiv stat">
+                                <p v-show="clicked || seconds == 0" class="disableSelect ">{{
                                     props.question.playerBStat.toFixed(1)
-                                }} {{ props.question.statCategory.substring(0, 1) }}PG
+                                }}
+                                </p>
+                                <p v-show="clicked || seconds == 0" class="disableSelect"> {{
+                                    props.question.statCategory.substring(0, 1) }}PG
                                 </p>
                             </div>
                         </div>
@@ -173,18 +203,22 @@ onMounted(() => {
 
 .clicked {
     background-color: rgba(54, 69, 79, 0.3);
+    transition: background-color 0.33s ease;
 }
 
 .clickedCorrect {
-    background-color: rgba(2, 69, 32, .3)
+    background-color: rgba(2, 69, 32, .3);
+    transition: background-color 0.167s ease;
 }
 
 .clickedIncorrect {
     background-color: rgba(181, 0, 22, .3);
+    transition: background-color 0.167s ease;
 }
 
 .noClick {
     background-color: rgba(200, 132, 1, .3);
+    transition: background-color 0.33s ease;
 }
 
 .clicked:hover,
@@ -208,12 +242,16 @@ onMounted(() => {
     justify-content: space-around;
 }
 
+.eight {
+    color: #552583
+}
+
 .info {
     border-top: solid 6px black;
     padding-top: .5em;
     padding-bottom: .5em;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
 
 .nameText {
@@ -233,14 +271,14 @@ onMounted(() => {
     margin-left: .5em;
     background-color: white;
     min-width: 23%;
-    border-radius: 12px;
-    box-shadow: 6px 12px 12px hsl(0deg 0% 0% / 0.25);
+    border-radius: 6px;
+    box-shadow: 3px 6px 6px hsl(0deg 0% 0% / 0.25);
     margin-bottom: 4em;
 }
 
 .playerCard:hover {
-    transform: scale(1.02);
-    box-shadow: 6px 12px 12px hsl(0deg 0% 0% / 0.21);
+    transform: scale(1.01);
+    box-shadow: 4.5px 9px 9px hsl(0deg 0% 0% / 0.21);
 }
 
 .playerHeadshot {
@@ -267,7 +305,7 @@ onMounted(() => {
 
 .stat {
     justify-content: right;
-    padding-right: .5em;
+    margin-right: .5em;
 }
 
 .timer {
@@ -286,21 +324,26 @@ onMounted(() => {
     justify-content: center;
     margin-top: auto;
     margin-bottom: auto;
+    border-radius: 3px;
 }
 
 .timerClose {
     color: white;
     outline: solid 3px rgba(255, 150, 0, .7);
+    border-radius: 1.5px;
+    transition: background-color 0.167s ease;
 }
 
 .timerCloser {
     outline: solid 3px rgba(128, 0, 0, 0.5);
     color: white;
+    border-radius: 1.5px;
+    transition: background-color 0.167s ease;
 }
 
 .timerExpired {
     background-color: rgba(181, 0, 22, .3);
-    /* outline: solid 3px rgba(255, 150, 0, .7); */
+    outline: solid 4px white;
     color: black;
 }
 
@@ -325,5 +368,15 @@ img {
 p {
     margin: 0;
     padding: 0;
+}
+
+@media((min-width: 375px) and (max-width: 415px)) {
+    h4 {
+        font-size: .8em;
+    }
+
+    p {
+        font-size: .8em;
+    }
 }
 </style>

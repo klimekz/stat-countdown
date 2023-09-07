@@ -11,14 +11,10 @@ function startDailyChallenge() {
   playing.value = true;
 }
 
-// function startRandomGame() {
-//   alert("'Free Play' coming soon! 'Free Play' will allow additional options to filter time ranges against the data. Please create an account to have access to 'Free Play' on drop !")
-// }
-
 function titleClickHandler() {
   if (playing.value) {
     playing.value = !playing.value;
-    showStats.value = true;
+    showStats.value = false;
   }
 }
 
@@ -47,14 +43,15 @@ function toggleStats() {
     </div>
     <div class="buttons">
       <button v-if="!playing" @click="startDailyChallenge">Daily Challenge</button>
-      <!-- <button v-if="!playing" @click="startRandomGame">Free Play</button> -->
       <button v-if="!playing && !showStats" @click="toggleStats">Show Stats</button>
       <button v-if="!playing && showStats" @click="toggleStats">Hide Stats</button>
 
     </div>
     <GameInstance class="gameBorder" v-if="playing" @count-completed="handleCompletedGame"
       @restart-game="titleClickHandler" :numCompleted="completedGames"></GameInstance>
-    <DailyStats v-if="!playing && showStats" />
+    <div class="stats">
+      <DailyStats v-if="!playing && showStats" />
+    </div>
   </div>
   <div class="footerContainer">
     <div>
@@ -65,7 +62,8 @@ function toggleStats() {
 
 <style scoped>
 button {
-  margin: 2em;
+  margin: 1em;
+  width: 10em;
 }
 
 .headerContainer {
@@ -81,6 +79,7 @@ h4 {
 
 }
 
+
 .footerContainer {
   margin-top: 2.66em;
   margin-bottom: 2.66em;
@@ -95,9 +94,29 @@ h4 {
   flex-direction: column;
 }
 
+
+
 .textContent {
-  max-width: 55%;
+  max-width: 90%;
   margin-bottom: .33em;
+}
+
+.stats {
+  width: 85%;
+  align-self: center;
+}
+
+
+@media (min-width: 850px) {
+  .textContent {
+    max-width: 55%;
+  }
+
+  .stats {
+    max-width: 55%;
+    align-self: center;
+  }
+
 }
 
 h1,

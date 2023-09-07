@@ -5,8 +5,7 @@ import { firebaseConfig } from "./FirebaseConfig.ts";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { Ref, onMounted, ref } from "vue";
-
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
 const db = getFirestore(app);
 const loaded: Ref<boolean> = ref(false);
 const results: Ref<any> = ref([]);
@@ -60,7 +59,7 @@ onMounted(() => {
             <p class="dateText">{{ new Date().toLocaleDateString("en-us") }}</p>
         </div>
         <br />
-        <h4>Global Number of Questions Guessed Correctly</h4>
+        <h4>Correct Answer Distribution</h4>
         <Bar v-if="loaded" id="correct-graph" :options="{
             responsive: true,
             backgroundColor: '#17408b',
@@ -75,9 +74,9 @@ onMounted(() => {
     datasets: [{
         data: Object.values(numCorrectValues),
     }]
-}" class="media graph" />
+}" class=" graph" />
         <br />
-        <h4>Global Number of Guesses Until an Incorrect Answer</h4>
+        <h4>Guesses Until an Incorrect Answer Distribution</h4>
         <Bar v-if="loaded" id="streak-graph" :options="{
             responsive: true,
             backgroundColor: '#c9082a',
@@ -92,18 +91,18 @@ onMounted(() => {
     datasets: [{
         data: Object.values(numStraightValue),
     }]
-}" class="media graph" />
+}" class=" graph" />
     </div>
 </template>
 
 <style scoped>
 .graph {
-    max-width: 55%;
+    max-width: auto;
     max-height: 55%;
 }
 
 .colRow {
-    min-width: 50%;
+    min-width: 100%;
 }
 
 .statCol {
@@ -111,6 +110,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    align-self: center;
 }
 
 .dateText {
