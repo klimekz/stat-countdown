@@ -1,6 +1,6 @@
 ### [statcountdown.com](https://www.statcountdown.com)
 
-** Note: this repository contains the boilerplate implemenation of this application. Please visit the hosted project to interact with this application among other projects.
+** Note: this repository contains the boilerplate implementation of this application. Please visit the hosted project to interact with this application among other projects.
 
 Vue.js trivia application demonstrating use of Emits to communicate between components. Utilizes a Python notebook to generate game data, and [Google Firebase](https://firebase.google.com) to store the current day's question set and statistics.
 
