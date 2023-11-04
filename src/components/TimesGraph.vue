@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup >
 import { Line } from "vue-chartjs";
 import {
     Chart as ChartJS,
@@ -10,10 +10,6 @@ import {
     Tooltip,
     Legend
 } from 'chart.js'
-
-type LineProps = {
-    answers: number[],
-}
 
 ChartJS.register(
     CategoryScale,
@@ -35,15 +31,14 @@ const options = {
         },
     }
 };
+const { answers } = defineProps(['answers'])
 
-
-const props = defineProps<LineProps>()
 </script>
 <template>
     <Line id="result-times" :options="options" :data="{
-        labels: props.answers.map((_, index) => (index + 1).toString()),
+        labels: answers.map((_, index) => (index + 1).toString()),
         datasets: [{
-            data: props.answers.map((t, index) => ({
+            data: answers.map((t, index) => ({
                 x: index,
                 y: t,
             })),

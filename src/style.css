@@ -1,28 +1,13 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: black;
-  background-color: rgba(255, 255, 248, 0.87);
-
-}
-
-.card {
-  padding: 2em;
-}
-
-.row{ 
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  text-align: center;
+  color-scheme: light ;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  background-color: #f9f9f9;
 }
 
 a {
@@ -31,15 +16,71 @@ a {
   text-decoration: inherit;
 }
 a:hover {
-  color: rgba(1, 75, 185, 0.8);
+  color: #17408b;
+  transition: 333ms;
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: top;
-  min-width: 320px;
+  /* place-items: center; */
+  min-width: 280px;
   min-height: 100vh;
+}
+
+.pageTop{
+  margin-top: 2em;
+}
+
+h1 {
+  line-height: 1.1;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  text-align: left;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+tr {
+  border: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+tr:hover {
+  background-color: #e0e0e0;
+}
+
+table td, table th {
+  padding: 8px;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 button {
@@ -49,49 +90,57 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #404040;
   cursor: pointer;
-  transition: border-color 0.25s;
   color: white;
-  min-width: 10em;
+  align-self: center;
+  width: auto;
+  max-width: 100%;
 }
 
-button:hover {
-  border-color: #646cff;
+button:hover {  
+  border-color: #17408b;
   transform: scale(1.02);
+  background-color: #17408b;
 }
-
 button:focus,
 button:focus-visible {
   outline: 4px auto white;
   transform: scale(1.02);
 }
 
-h1 {
-  font-size: 2em;
-  line-height: 1.1;
-  margin-left: auto;
-  margin-right: auto;
+@media(max-width: 400px){
+  #app{
+    max-width: 390px;
+    padding: 0;
+    margin: 0;
+  }
+
+  body{
+    max-width: 390px;
+    padding: 0;
+  }
+
 }
 
-img{
-  -webkit-user-drag: none;
-  -moz-user-select: none; /* For Firefox */
-  -webkit-user-select: none; /* For Safari and older versions of Chrome */
-  -ms-user-select: none;
-  user-select: none;
+@media(max-width: 450px){
+  #app{
+    max-width: 400px;
+    padding: 0;
+    margin: 0;
+  }
+  
+  body{
+    max-width: 400px;
+    padding: 0;
+    margin: 0;
+    align-self: center;
+  }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: black;
-    background-color: rgba(209, 229, 225, 0.317);
-    
-  }
-  a:hover {
-    color: rgba(0,75,185,1);
+    color: #213547;
+    background-color: #f9f9f9;
   }
 }
-
-
-
