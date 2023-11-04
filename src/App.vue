@@ -1,11 +1,48 @@
-<script setup lang="ts">
-import { Ref, ref } from "vue";
-import GameInstance from "./components/GameInstance.vue";
-import DailyStats from "./components/DailyStats.vue";
+<template>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-content">
+        <a href="/" class="app-title">Stat Countdown</a>
+        <a href="https:github.com/klimekz/stat-countdown" class="app-title">
+          GitHub
+        </a>
+      </div>
+    </header>
+    <div class="main-content pageTop">
+      <div>
+        <h2>Stat Countdown</h2>
+        <button v-if="!playing" @click="startDailyChallenge">Daily Challenge</button>
+        <button v-if="!playing && !showStats" @click="toggleStats">Show Stats</button>
+        <button v-if="!playing && showStats" @click="toggleStats">Hide Stats</button>
+        <InformationRow v-if="!playing" />
+        <p v-if="!playing && !showStats">Start a game or view today's stats.</p>
+        <GameInstance class="gameBorder" v-if="playing" @count-completed="handleCompletedGame"
+          @restart-game="titleClickHandler" :numCompleted="completedGames"></GameInstance>
+        <div class="stats">
+          <DailyStats v-if="!playing && showStats" />
+        </div>
+      </div>
+    </div>
+    <div class="footerContainer">
+      <div class="footerRow">
+        <p><a href="https://www.statcountdown.com">STAT COUNTDOWN</a> S'23</p>
+        <p><a href="https://www.github.com/klimekz/stat-countdown">stat-countdown</a></p>
+      </div>
+    </div>
+  </div>
+</template>
 
-const playing: Ref<boolean> = ref(false);
-const showStats: Ref<boolean> = ref(false);
-const completedGames: Ref<number> = ref(0);
+<script setup lang="ts">
+import { ref } from 'vue';
+const menuOpen = ref(false);
+import GameInstance from './components/GameInstance.vue'
+import DailyStats from './components/DailyStats.vue'
+import InformationRow from './components/InformationRow.vue'
+
+
+const playing = ref(false);
+const showStats = ref(false);
+const completedGames = ref(0);
 
 function startDailyChallenge() {
   playing.value = true;
@@ -28,100 +65,60 @@ function toggleStats() {
   showStats.value = !showStats.value;
 }
 
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value;
+};
 </script>
 
-<template>
-  <div class="page">
-    <h1 @click="titleClickHandler">STAT COUNTDOWN</h1>
-    <div class="headerContainer" v-if="!playing">
-      <h4 class="textContent">STAT COUNTDOWN is a sports trivia game against the clock.</h4>
-      <h4 class="textContent">Click on the player with the higher average per game for the displayed statistic
-        (PTS/REB/AST). The range
-        between the players' average for the chosen statistic per game will be narrowed down for each question.
-      </h4>
-      <h4 class="textContent">Complete today's quiz to see how you rank against the field.</h4>
-    </div>
-    <div class="buttons">
-      <button v-if="!playing" @click="startDailyChallenge">Daily Challenge</button>
-      <button v-if="!playing && !showStats" @click="toggleStats">Show Stats</button>
-      <button v-if="!playing && showStats" @click="toggleStats">Hide Stats</button>
-
-    </div>
-    <GameInstance class="gameBorder" v-if="playing" @count-completed="handleCompletedGame"
-      @restart-game="titleClickHandler" :numCompleted="completedGames"></GameInstance>
-    <div class="stats">
-      <DailyStats v-if="!playing && showStats" />
-    </div>
-  </div>
-  <div class="footerContainer">
-    <div>
-      <p><a href="https://www.statcountdown.com">STAT COUNTDOWN</a> S'23</p>
-    </div>
-  </div>
-</template>
-
 <style scoped>
+.app-container {
+  width: 100%;
+  padding-top: 3rem;
+}
+
+.footerContainer {
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.header-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+}
+
+.app-header {
+  box-sizing: border-box;
+  position: fixed;
+  /* This pins the header to the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #eee;
+  width: 100%;
+  z-index: 1000;
+}
+
+.app-title {
+  font-size: 1.2rem;
+}
+
 button {
   margin: 1em;
   width: 10em;
 }
 
-.headerContainer {
+.main-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  max-width: 75%;
-  align-self: center;
-}
-
-h4 {
-  max-width: 65%;
-
-}
-
-
-.footerContainer {
-  margin-top: 2.66em;
-  margin-bottom: 2.66em;
-}
-
-.gameBorder {
-  margin-bottom: 2em;
-}
-
-.page {
-  display: flex;
-  flex-direction: column;
-}
-
-
-
-.textContent {
-  max-width: 90%;
-  margin-bottom: .33em;
-}
-
-.stats {
-  width: 85%;
-  align-self: center;
-}
-
-
-@media (min-width: 850px) {
-  .textContent {
-    max-width: 55%;
-  }
-
-  .stats {
-    max-width: 55%;
-    align-self: center;
-  }
-
-}
-
-h1,
-p {
-  margin-bottom: .116em;
-
+  justify-content: start;
 }
 </style>

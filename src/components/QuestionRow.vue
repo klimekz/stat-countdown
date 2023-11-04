@@ -1,56 +1,36 @@
-<script setup lang="ts">
-import { Ref, onMounted, ref } from "vue";
+<script setup >
+import { onMounted, ref } from "vue";
 
-type QData = {
-    playerAId: string,
-    playerAName: string,
-    playerAStat: number,
-    playerATeam: string,
-    playerBId: string,
-    playerBName: string,
-    playerBStat: number,
-    playerBTeam: string,
-    season: string,
-    answer: string,
-    statCategory: string,
-    interval: number
-}
-
-type PropType = {
-    time: number,
-    question: QData
-}
-
-const clicked: Ref<boolean> = ref(false);
+const { question, time } = defineProps(['question', 'time'])
+const clicked = ref(false);
 const emit = defineEmits();
-const guess: Ref<string> = ref("");
-const props = defineProps<PropType>();
-const seconds: Ref<number> = ref(props.time);
-const showA: Ref<boolean> = ref(false);
-const showB: Ref<boolean> = ref(false);
-let timerId: any = 0;
-let startTime: Date | undefined = undefined;
-let endTime: Date | undefined = undefined;
-let diff: number = props.time + .2;
+const guess = ref("");
+const seconds = ref(time);
+const showA = ref(false);
+const showB = ref(false);
+let timerId = 0;
+let startTime = undefined;
+let endTime = undefined;
+let diff = time + .2;
 
 
 function emitQuestionCompleted() {
     emit('question-completed', null);
 }
 
-function emitQuestionCorrect(diff: number) {
+function emitQuestionCorrect(diff) {
     emit('question-correct', diff);
 }
 
-function emitQuestionIncorrect(diff: number) {
+function emitQuestionIncorrect(diff) {
     emit('question-incorrect', diff);
 }
 
-function emitQuestionMissed(diff: number) {
+function emitQuestionMissed(diff) {
     emit('question-missed', diff)
 }
 
-function getCardStyle(name: string, answer: string): string {
+function getCardStyle(name, answer) {
     if (seconds.value === 0)
         return "info clicked noClick"
     if (!clicked.value) {
@@ -66,27 +46,27 @@ function getCardStyle(name: string, answer: string): string {
     }
 }
 
-function getPlayerPath(playerId: string): string {
+function getPlayerPath(playerId) {
     return "https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/" +
         playerId + ".png";
 }
 
-function getTimerStyle(time: number): string {
+function getTimerStyle(time) {
     return time > 2 ? " timer" : time == 2 ? " timer timerClose" : time == 1 ? " timer timerCloser" : " timer timerExpired"
 }
 
-function onCardClick(name: string) {
+function onCardClick(name) {
     let clickEnd = new Date()
     if (endTime === undefined) {
         endTime = clickEnd
-        diff = ((endTime.getTime() - startTime!.getTime()) / 1000)
+        diff = ((endTime.getTime() - startTime.getTime()) / 1000)
     }
 
     if (!clicked.value && seconds.value > 0) {
         guess.value = name;
         clearInterval(timerId);
         clicked.value = !clicked.value;
-        if (guess.value === props.question.answer) {
+        if (guess.value === question.answer) {
             emitQuestionCorrect(diff);
         }
         else {
@@ -110,7 +90,7 @@ function updateTime() {
         let clickEnd = new Date()
         if (endTime === undefined) {
             endTime = clickEnd
-            diff = ((endTime.getTime() - startTime!.getTime()) / 1000)
+            diff = ((endTime.getTime() - startTime.getTime()) / 1000)
         }
         seconds.value = 0;
         clearInterval(timerId);
@@ -130,25 +110,25 @@ onMounted(() => {
     <div class="qCol">
         <div v-show="showA && showB" class="row">
             <div class="col">
-                <h2>{{ props.question.statCategory }}</h2>
-                <div class="playerCard" @click="onCardClick(props.question.playerAName)">
-                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerAId)"
+                <h2>{{ question.statCategory }}</h2>
+                <div class="playerCard" @click="onCardClick(question.playerAName)">
+                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(question.playerAId)"
                             @load="showA = true" />
-                        <h5 class="teamTxt">{{ props.question.playerATeam }}</h5>
+                        <h5 class="teamTxt">{{ question.playerATeam }}</h5>
                     </div>
-                    <div :class="getCardStyle(props.question.playerAName, props.question.answer)">
+                    <div :class="getCardStyle(question.playerAName, question.answer)">
                         <div class="infoRow">
                             <div class="nameDiv">
-                                <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[0] }} </h4>
-                                <h4 class="disableSelect nameText">{{ props.question.playerAName.split(" ")[1] }} </h4>
+                                <h4 class="disableSelect nameText">{{ question.playerAName.split(" ")[0] }} </h4>
+                                <h4 class="disableSelect nameText">{{ question.playerAName.split(" ")[1] }} </h4>
                             </div>
                             <div class="nameDiv stat">
                                 <p v-show="clicked || seconds == 0" class="disableSelect ">{{
-                                    props.question.playerAStat.toFixed(1)
+                                    question.playerAStat.toFixed(1)
                                 }}
                                 </p>
                                 <p v-show="clicked || seconds == 0" class="disableSelect"> {{
-                                    props.question.statCategory.substring(0, 1) }}PG
+                                    question.statCategory.substring(0, 1) }}PG
                                 </p>
                             </div>
                         </div>
@@ -159,25 +139,25 @@ onMounted(() => {
                 <h4 class="timerText disableSelect" @click="runTimer">0{{ seconds }}</h4>
             </div>
             <div class="col">
-                <h2>{{ props.question.season }} </h2>
-                <div class="playerCard" @click="onCardClick(props.question.playerBName)">
-                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(props.question.playerBId)"
+                <h2>{{ question.season }} </h2>
+                <div class="playerCard" @click="onCardClick(question.playerBName)">
+                    <div class="imgContainer"><img class="playerHeadshot" :src="getPlayerPath(question.playerBId)"
                             @load="showB = true" />
-                        <h5 class="teamTxt">{{ props.question.playerBTeam }}</h5>
+                        <h5 class="teamTxt">{{ question.playerBTeam }}</h5>
                     </div>
-                    <div :class="getCardStyle(props.question.playerBName, props.question.answer)">
+                    <div :class="getCardStyle(question.playerBName, question.answer)">
                         <div class="infoRow">
                             <div class="nameDiv">
-                                <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[0] }} </h4>
-                                <h4 class="disableSelect nameText">{{ props.question.playerBName.split(" ")[1] }} </h4>
+                                <h4 class="disableSelect nameText">{{ question.playerBName.split(" ")[0] }} </h4>
+                                <h4 class="disableSelect nameText">{{ question.playerBName.split(" ")[1] }} </h4>
                             </div>
                             <div class="nameDiv stat">
                                 <p v-show="clicked || seconds == 0" class="disableSelect ">{{
-                                    props.question.playerBStat.toFixed(1)
+                                    question.playerBStat.toFixed(1)
                                 }}
                                 </p>
                                 <p v-show="clicked || seconds == 0" class="disableSelect"> {{
-                                    props.question.statCategory.substring(0, 1) }}PG
+                                    question.statCategory.substring(0, 1) }}PG
                                 </p>
                             </div>
                         </div>
@@ -196,6 +176,13 @@ onMounted(() => {
     right: 1em;
 }
 
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+
 .imgContainer {
     position: relative;
     text-align: center;
@@ -207,7 +194,7 @@ onMounted(() => {
 }
 
 .clickedCorrect {
-    background-color: rgba(2, 69, 32, .3);
+    background-color: #0245204d;
     transition: background-color 0.167s ease;
 }
 
@@ -269,16 +256,16 @@ onMounted(() => {
     /* outline: solid 7px black; */
     margin-right: .5em;
     margin-left: .5em;
-    background-color: white;
+    background-color: rgb(232, 232, 232);
     min-width: 23%;
     border-radius: 6px;
-    box-shadow: 3px 6px 6px hsl(0deg 0% 0% / 0.25);
+    box-shadow: 1px 2px 2px hsl(0deg 0% 0% / 0.18);
     margin-bottom: 4em;
 }
 
 .playerCard:hover {
     transform: scale(1.01);
-    box-shadow: 4.5px 9px 9px hsl(0deg 0% 0% / 0.21);
+    box-shadow: 2px 4px 4px hsl(0deg 0% 0% / 0.24);
 }
 
 .playerHeadshot {
@@ -368,6 +355,13 @@ img {
 p {
     margin: 0;
     padding: 0;
+}
+
+@media (max-width:500px) {
+    .timer {
+        margin-left: .5em;
+        margin-right: .5em;
+    }
 }
 
 @media((min-width: 375px) and (max-width: 415px)) {

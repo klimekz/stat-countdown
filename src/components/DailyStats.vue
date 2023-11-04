@@ -1,16 +1,16 @@
-<script setup lang="ts">
+<script setup>
 import { Bar } from "vue-chartjs"
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import { firebaseConfig } from "./FirebaseConfig.ts";
+import { firebaseConfig } from "./FirebaseConfig.js";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { Ref, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app);
-const loaded: Ref<boolean> = ref(false);
-const results: Ref<any> = ref([]);
-let numCorrectValues: any = {};
-let numStraightValue: any = {};
+const loaded = ref(false);
+const results = ref([]);
+let numCorrectValues = {};
+let numStraightValue = {};
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -39,9 +39,9 @@ async function getResults() {
 }
 
 function getDate() {
-    const d: Date = new Date()
-    const month: string = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
-    const date: string = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
+    const d = new Date()
+    const month = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
+    const date = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
     return d.getFullYear() + "-" + month + "-" + date;
 }
 
@@ -55,7 +55,7 @@ onMounted(() => {
 <template>
     <div class="statCol">
         <div class="colRow row">
-            <h2>Today's Stats</h2>
+            <h3>Daily Stats</h3>
             <p class="dateText">{{ new Date().toLocaleDateString("en-us") }}</p>
         </div>
         <br />
@@ -97,7 +97,7 @@ onMounted(() => {
 
 <style scoped>
 .graph {
-    max-width: auto;
+    max-width: 75%;
     max-height: 55%;
 }
 

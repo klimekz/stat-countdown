@@ -1,52 +1,36 @@
-<script setup lang="ts">
-import { onMounted, ref, Ref } from "vue";
+<script setup >
+import { onMounted, ref } from "vue";
 import QuestionRow from "./QuestionRow.vue";
 import DailyStats from "./DailyStats.vue";
 import { getFirestore, collection, getDocs, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import JSConfetti from 'js-confetti';
-import { firebaseConfig } from "./FirebaseConfig.ts";
+import JSConfetti from 'js-confetti'
+import { firebaseConfig } from "./FirebaseConfig.js";
 import TimesGraph from "./TimesGraph.vue";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const displayQuestions: Ref<QData[]> = ref([]);
+const displayQuestions = ref([]);
 const emit = defineEmits();
 const gameComplete = ref(false);
-const loaded: Ref<boolean> = ref(false);
-const numCorrect: Ref<number> = ref(0);
-const numCorrectStreak: Ref<number> = ref(0);
-const numIncorrect: Ref<number> = ref(0);
+const loaded = ref(false);
+const numCorrect = ref(0);
+const numCorrectStreak = ref(0);
+const numIncorrect = ref(0);
 const timerSeconds = ref(5);
-const answerTimes: Ref<number[]> = ref([])
-const questions: Ref<QData[]> = ref([]);
-const startTime: Ref<Date> = ref(new Date());
-const endTime: Ref<Date> = ref(new Date());
-const instanceTime: Ref<number | undefined> = ref(undefined);
+const answerTimes = ref([])
+const questions = ref([]);
+const startTime = ref(new Date());
+const endTime = ref(new Date());
+const instanceTime = ref(undefined);
 let numQuestions = 1;
-type PropType = {
-    numCompleted: number,
-}
-const props = defineProps<PropType>();
 
-type QData = {
-    playerAId: string,
-    playerAName: string,
-    playerAStat: number,
-    playerATeam: string,
-    playerBId: string,
-    playerBName: string,
-    playerBStat: number,
-    playerBTeam: string,
-    season: string,
-    answer: string,
-    statCategory: string,
-    interval: number
-}
+const { numCompleted } = defineProps(['numCompleted'])
+
 
 async function getQs() {
     const querySnapshot = await getDocs(collection(db, "daily-challenge", getDate(), "questions"));
     querySnapshot.forEach((doc) => {
-        const q: QData = {
+        const q = {
             playerAId: doc.data().PlayerAId,
             playerAName: doc.data().PlayerAName,
             playerAStat: doc.data().PlayerAStatperGame,
@@ -79,7 +63,7 @@ function addNextQuestion() {
         instanceTime.value = (endTime.value.getTime() - startTime.value.getTime()) / 1000
         gameComplete.value = true;
         emitCompletedGame();
-        if (props.numCompleted < 1) {
+        if (numCompleted < 1) {
             setDoc(doc(db, "daily-challenge", getDate(), "results", new Date().toISOString()), {
                 numCorrectScore: numCorrect.value,
                 streakCorrectScore: numCorrectStreak.value
@@ -103,16 +87,16 @@ function addNextQuestion() {
 }
 
 function getDate() {
-    const d: Date = new Date()
-    const month: string = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
-    const date: string = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
+    const d = new Date()
+    const month = d.getMonth() < 9 ? "0" + (d.getMonth() + 1).toString() : (d.getMonth() + 1).toString();
+    const date = d.getDate() < 10 ? "0" + d.getDate() : d.getDate().toString();
     return d.getFullYear() + "-" + month + "-" + date;
 }
 
 let returnStr = ""
 let streakStr = ""
 
-function appendResult(a: string) {
+function appendResult(a) {
     returnStr = returnStr + a
 }
 
@@ -125,7 +109,7 @@ function emitCompletedGame() {
     emit('count-completed', null);
 }
 
-function incrCorrect(d: number) {
+function incrCorrect(d) {
     if (numIncorrect.value === 0) {
         numCorrectStreak.value++;
         streakStr = streakStr + "✅"
@@ -136,13 +120,13 @@ function incrCorrect(d: number) {
 
 }
 
-function incrIncorrect(d: number) {
+function incrIncorrect(d) {
     answerTimes.value.push(d)
     numIncorrect.value++;
     appendResult('🟥')
 }
 
-function qMissed(d: number) {
+function qMissed(d) {
     answerTimes.value.push(d);
     numIncorrect.value++;
     appendResult('🟧')
@@ -169,8 +153,7 @@ onMounted(() => {
 <template>
     <div class="col">
         <div class="row title">
-            <h2>Daily Challenge:
-            </h2>
+            <h2>Daily Challenge:</h2>
             <h3 class="date">{{ new Date().toLocaleDateString('en-us') }}</h3>
         </div>
         <h3 v-if="!loaded">Loading. . . </h3>
@@ -182,19 +165,23 @@ onMounted(() => {
                 numQuestions }}</span>
         </h3>
         <h3 class="resultText perfectText" v-if="numCorrect === 10 && numQuestions === 10">Perfect Game!</h3>
-        <h3 class="resultText" v-if="gameComplete">You answered {{ numCorrectStreak }} {{
-            numCorrectStreak === 1 ?
-            "question" :
-            "questions"
-        }}
+        <h3 class="resultText" v-if="numCorrect === 10 && numQuestions === 10">You got all of today's questions correct!
+        </h3>
+        <h3 class="resultText" v-if="gameComplete && numCorrect < 10 && numCorrect > 0">You answered {{ numCorrectStreak }}
+            {{
+                numCorrectStreak === 1 ?
+                "question" :
+                "questions"
+            }}
             correctly before making a mistake.</h3>
+        <h3 class="resultText" v-if="numCorrect === 0 && gameComplete">Try again.</h3>
         <br />
         <div class="resultCard" v-if="gameComplete">
             <p class="cardElement">My {{ new Date().toLocaleDateString("en-us") }} #StatCountdown 🏀</p>
-            <p v-if="props.numCompleted <= 1" class="cardElement">{{ numCorrect }} / {{ numQuestions }} correct in {{
+            <p v-if="numCompleted <= 1" class="cardElement">{{ numCorrect }} / {{ numQuestions }} correct in {{
                 instanceTime?.toFixed() }} seconds.
             </p>
-            <p v-if="props.numCompleted > 1" class="cardElement">{{ numCorrect }} / {{ numQuestions }} correct in {{
+            <p v-if="numCompleted > 1" class="cardElement">{{ numCorrect }} / {{ numQuestions }} correct in {{
                 instanceTime?.toFixed() }} seconds (Attempt {{
         numCompleted }}).
             </p>
@@ -217,6 +204,13 @@ onMounted(() => {
     height: 60%;
 }
 
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+
 .eight {
     margin-top: 0;
     padding-top: 0;
@@ -229,7 +223,6 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     justify-content: center;
-
 }
 
 .results {
@@ -239,10 +232,6 @@ onMounted(() => {
     justify-content: space-around;
 }
 
-button {
-    max-width: 10em;
-    align-self: center;
-}
 
 .resultCard {
     padding-right: 1.5em;
@@ -255,7 +244,7 @@ button {
     text-align: left;
     align-self: center;
     max-width: 70%;
-    box-shadow: 2px 4px 4px hsl(0deg 0% 0% / 0.33);
+    box-shadow: 2px 4px 4px hsl(0deg 0% 0% / 0.24);
 }
 
 .resultCard:hover {
@@ -287,7 +276,6 @@ button {
 .stats {
     max-width: 85%;
     align-self: center;
-
 }
 
 @media (min-width: 850px) {
@@ -297,8 +285,9 @@ button {
     }
 }
 
-
 button {
+    max-width: 10em;
+    align-self: center;
     margin: 1em;
     width: auto;
 }
