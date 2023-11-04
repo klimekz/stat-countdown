@@ -97,7 +97,7 @@ onMounted(() => {
 
 <style scoped>
 .graph {
-    max-width: auto;
+    max-width: 75%;
     max-height: 55%;
 }
 

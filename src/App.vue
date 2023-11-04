@@ -11,10 +11,10 @@
     <div class="main-content pageTop">
       <div>
         <h2>Stat Countdown</h2>
-
         <button v-if="!playing" @click="startDailyChallenge">Daily Challenge</button>
         <button v-if="!playing && !showStats" @click="toggleStats">Show Stats</button>
         <button v-if="!playing && showStats" @click="toggleStats">Hide Stats</button>
+        <InformationRow v-if="!playing" />
         <p v-if="!playing && !showStats">Start a game or view today's stats.</p>
         <GameInstance class="gameBorder" v-if="playing" @count-completed="handleCompletedGame"
           @restart-game="titleClickHandler" :numCompleted="completedGames"></GameInstance>
@@ -26,17 +26,18 @@
     <div class="footerContainer">
       <div class="footerRow">
         <p><a href="https://www.statcountdown.com">STAT COUNTDOWN</a> S'23</p>
-        <p><a href="https://www.twitter.com/statcountdown">@statcountdown</a></p>
+        <p><a href="https://www.github.com/klimekz/stat-countdown">stat-countdown</a></p>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 const menuOpen = ref(false);
 import GameInstance from './components/GameInstance.vue'
 import DailyStats from './components/DailyStats.vue'
+import InformationRow from './components/InformationRow.vue'
 
 
 const playing = ref(false);
